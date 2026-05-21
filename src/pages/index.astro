@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const title = 'Divorce Settlement Calculator | divorcesettlementcalc.com';
+const description = 'Estimate how marital assets may be divided in a divorce. Covers community property vs. equitable distribution, spousal support, and retirement accounts. Free, informational.';
+---
+<BaseLayout title={title} description={description}>
+  <h1>Divorce Settlement Calculator</h1>
+  <p><em>Reviewed by Aspen Lockwood (AL), Editor-in-Chief. Updated May 2026.</em></p>
+  <p>Divorce settlement involves dividing marital property, determining spousal support (alimony), and &mdash; when children are involved &mdash; child support and custody arrangements. Asset division rules differ significantly by state: nine states use community property (50/50 split of marital assets); the rest use equitable distribution (fair but not necessarily equal). This calculator estimates potential settlement ranges.</p>
+  <h2>Run the estimate</h2>
+  <form id="calc" novalidate>
+    <label for="total-assets">Total marital assets (USD — home equity, savings, investments, retirement)</label>
+    <input id="total-assets" type="number" value="400000" min="0" />
+    <label for="total-debt">Total marital debt (USD — mortgage balance, car loans, credit cards)</label>
+    <input id="total-debt" type="number" value="100000" min="0" />
+    <label for="your-income">Your annual income (USD)</label>
+    <input id="your-income" type="number" value="60000" min="0" />
+    <label for="spouse-income">Spouse&rsquo;s annual income (USD)</label>
+    <input id="spouse-income" type="number" value="90000" min="0" />
+    <label for="years-married">Years married</label>
+    <input id="years-married" type="number" value="10" min="0" max="60" />
+    <label for="property-state">Property division regime</label>
+    <select id="property-state">
+      <option value="equitable">Equitable distribution state (most states)</option>
+      <option value="community">Community property state (AZ, CA, ID, LA, NV, NM, TX, WA, WI)</option>
+    </select>
+    <label for="fault">Fault divorce state &amp; fault involved?</label>
+    <select id="fault">
+      <option value="no-fault">No-fault divorce (irreconcilable differences only)</option>
+      <option value="fault">Fault grounds (adultery, abandonment, cruelty) — may affect division</option>
+    </select>
+    <button type="submit">Estimate settlement</button>
+  </form>
+  <p id="result" aria-live="polite"></p>
+  <h2>How divorce asset division works</h2>
+  <p>In community property states, marital property (acquired during the marriage) is split 50/50. Separate property (owned before marriage or received as gift/inheritance) is not subject to division. In equitable distribution states, courts divide marital property &ldquo;equitably&rdquo; &mdash; considering each spouse&rsquo;s income, contributions, needs, and length of marriage. Equitable does not mean equal; outcomes range from 45/55 to 60/40 depending on circumstances.</p>
+  <h2>Spousal support overview</h2>
+  <p>Alimony duration and amount depend on the income disparity, length of marriage, and standard of living during the marriage. In long marriages (15+ years) with significant income disparities, long-term or permanent alimony may be awarded. Short marriages typically produce rehabilitative alimony of 1&ndash;3 years.</p>
+  <h2>Where to learn more</h2>
+  <p>See <a href="/guides/how-divorce-asset-division-works">how divorce asset division works</a>, <a href="/guides/spousal-support-guide">spousal support guide</a>, <a href="/guides/what-to-do-during-divorce">what to do during divorce</a>, and <a href="/guides/divorce-settlement-misconceptions">common divorce settlement misconceptions</a>.</p>
+  <script>
+    document.getElementById('calc').addEventListener('submit', e => {
+      e.preventDefault();
+      const assets = parseFloat(document.getElementById('total-assets').value)||400000;
+      const debt = parseFloat(document.getElementById('total-debt').value)||0;
+      const yourIncome = parseFloat(document.getElementById('your-income').value)||0;
+      const spouseIncome = parseFloat(document.getElementById('spouse-income').value)||0;
+      const years = parseFloat(document.getElementById('years-married').value)||0;
+      const regime = document.getElementById('property-state').value;
+      const netEstate = Math.max(0, assets - debt);
+      let yourShare, spouseShare;
+      if (regime==='community') {
+        yourShare = netEstate * 0.5;
+        spouseShare = netEstate * 0.5;
+      } else {
+        // Equitable: adjust for income disparity and years married
+        const totalIncome = yourIncome + spouseIncome || 1;
+        const incomeRatio = yourIncome / totalIncome;
+        // Lower earner gets slight premium in equitable states, especially longer marriages
+        const longevityAdj = Math.min(0.05, years * 0.003);
+        const yourFactor = incomeRatio < 0.5 ? (0.5 + longevityAdj) : (0.5 - longevityAdj);
+        yourShare = netEstate * Math.max(0.4, Math.min(0.6, yourFactor));
+        spouseShare = netEstate - yourShare;
+      }
+      // Spousal support (rough estimate)
+      const incomeGap = Math.abs(yourIncome - spouseIncome);
+      const monthlySupport = years >= 5 ? incomeGap * 0.25 / 12 : 0;
+      const supportMonths = Math.min(years * 12, 120);
+      const totalSupport = monthlySupport * supportMonths;
+      const fmt = n=>'$'+Math.round(n).toLocaleString();
+      const supportNote = monthlySupport > 0 ? ` &bull; Potential spousal support: ${fmt(monthlySupport)}/mo for ~${supportMonths} months (${fmt(totalSupport)} total)` : ' &bull; Spousal support: unlikely (short marriage or similar incomes)';
+      document.getElementById('result').innerHTML =
+        `<strong>Estimated asset split: Your share ${fmt(yourShare)} &ndash; Spouse ${fmt(spouseShare)}</strong><br>Net marital estate: ${fmt(netEstate)}${supportNote}<br><em>Actual outcomes depend on state law, negotiation, and judge discretion. Consult a family law attorney.</em>`;
+    });
+  </script>
+</BaseLayout>
