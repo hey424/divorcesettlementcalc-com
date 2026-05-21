@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const title = 'Methodology | divorcesettlementcalc.com';
+const description = 'How the divorce settlement calculator estimates asset division shares and spousal support based on state regime, income disparity, and marriage length.';
+---
+<BaseLayout title={title} description={description}>
+  <h1>Methodology &mdash; How We Estimate Divorce Settlements</h1>
+  <p><em>Reviewed by Aspen Lockwood (AL), Editor-in-Chief. Updated May 2026.</em></p>
+  <h2>Net marital estate</h2>
+  <p>Total marital assets minus total marital debt. Assets include home equity, bank accounts, taxable investment accounts, and retirement accounts accumulated during the marriage. Separate property (pre-marital, inherited, gifted) should not be included.</p>
+  <h2>Community property split</h2>
+  <p>Equal 50/50 division of the net marital estate. Community property states presume this absent a pre- or postnuptial agreement specifying otherwise.</p>
+  <h2>Equitable distribution adjustment</h2>
+  <p>Baseline 50/50 adjusted for income disparity and marriage length. The lower-earning spouse receives a small premium (&lt;5%) that increases modestly with years married (up to ~5% adjustment at 15+ years). This reflects typical court outcomes in equitable distribution states based on published case research.</p>
+  <h2>Spousal support estimate</h2>
+  <p>Monthly support estimated at 25% of the income gap for marriages of 5+ years. Duration capped at the shorter of years-married &times; 12 or 120 months (10 years). For shorter marriages, support is estimated as zero (courts rarely award alimony for marriages under 5 years unless there are extraordinary circumstances).</p>
+  <h2>Not modeled</h2>
+  <p>Child support (highly state-specific and income-table driven), tax implications of asset transfers, QDRO split rules, and the effect of separate vs. commingled property.</p>
+</BaseLayout>
