@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://divorcesettlementcalc.com/sitemap-index.xml
