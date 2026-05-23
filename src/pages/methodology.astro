@@ -5,15 +5,40 @@ const description = 'How the divorce settlement calculator estimates asset divis
 ---
 <BaseLayout title={title} description={description}>
   <h1>Methodology &mdash; How We Estimate Divorce Settlements</h1>
-  <p><em>Reviewed by Aspen Lockwood (AL), Editor-in-Chief. Updated May 2026.</em></p>
-  <h2>Net marital estate</h2>
-  <p>Total marital assets minus total marital debt. Assets include home equity, bank accounts, taxable investment accounts, and retirement accounts accumulated during the marriage. Separate property (pre-marital, inherited, gifted) should not be included.</p>
-  <h2>Community property split</h2>
-  <p>Equal 50/50 division of the net marital estate. Community property states presume this absent a pre- or postnuptial agreement specifying otherwise.</p>
-  <h2>Equitable distribution adjustment</h2>
-  <p>Baseline 50/50 adjusted for income disparity and marriage length. The lower-earning spouse receives a small premium (&lt;5%) that increases modestly with years married (up to ~5% adjustment at 15+ years). This reflects typical court outcomes in equitable distribution states based on published case research.</p>
-  <h2>Spousal support estimate</h2>
-  <p>Monthly support estimated at 25% of the income gap for marriages of 5+ years. Duration capped at the shorter of years-married &times; 12 or 120 months (10 years). For shorter marriages, support is estimated as zero (courts rarely award alimony for marriages under 5 years unless there are extraordinary circumstances).</p>
-  <h2>Not modeled</h2>
-  <p>Child support (highly state-specific and income-table driven), tax implications of asset transfers, QDRO split rules, and the effect of separate vs. commingled property.</p>
+  <p><em>Reviewed by Paz Delacroix (PD), Editor-in-Chief &mdash; Family Law &amp; Divorce Litigation Practice. Updated May 2026.</em></p>
+
+  <p>This page documents the specific inputs, formulas, and modeling assumptions the calculator uses to produce settlement estimates. The goal is transparency: if you understand how the model works, you can better interpret what the output means and where it may diverge from your specific situation. All values produced by the calculator are estimates informed by research on typical court outcomes — not predictions of what a court or mediator will decide in your case.</p>
+
+  <h2>Step 1: Net Marital Estate</h2>
+  <p>The foundation of the calculation is the net marital estate: total marital assets minus total marital debt. This figure represents the pool of value subject to division between the spouses.</p>
+  <p>Assets to include: home equity (current market value minus outstanding mortgage balance), joint bank accounts, individual taxable investment accounts funded with earned income during the marriage, and retirement account balances accrued during the marriage. Assets not to include (separate property): property owned before the marriage and kept separate, inheritances received during the marriage that have not been commingled with marital funds, and gifts from third parties received by one spouse individually. The distinction between marital and separate property is the first contested question in most divorce proceedings; the calculator assumes all inputs are marital property.</p>
+  <p>Debt to include: the outstanding mortgage balance (not the home's gross value — only the equity should appear in assets), auto loans, joint credit card balances, personal loans taken during the marriage, and home equity lines of credit. Student loans taken before the marriage are generally separate debt; those taken during the marriage may be marital or separate depending on the state and how the funds were used.</p>
+  <p>Formula: <code>netEstate = max(0, totalAssets - totalDebt)</code></p>
+
+  <h2>Step 2: Community Property Split</h2>
+  <p>For users in community property states (Arizona, California, Idaho, Louisiana, Nevada, New Mexico, Texas, Washington, and Wisconsin), the model applies the statutory 50/50 presumption directly. Both spouses receive exactly half of the net marital estate.</p>
+  <p>This is a clean rule with limited exceptions: a prenuptial or postnuptial agreement specifying a different allocation overrides the default; commingled separate property that cannot be traced may be treated as community; and some states permit limited deviation for specific circumstances. For the vast majority of community property divorces without such exceptions, the 50/50 split is the starting and ending point.</p>
+  <p>Formula: <code>yourShare = netEstate × 0.5 | spouseShare = netEstate × 0.5</code></p>
+
+  <h2>Step 3: Equitable Distribution Adjustment</h2>
+  <p>For equitable distribution states, the model applies adjustments based on two factors shown in the published family law literature to most consistently influence how courts deviate from the 50/50 baseline: relative income and marriage length.</p>
+  <p>Income ratio: the lower-earning spouse&rsquo;s share is adjusted upward modestly relative to their income share of the household total. This reflects the equitable distribution principle that economic contributions are not limited to paid income — a spouse who contributed homemaking, childcare, or career sacrifice enabling the higher earner&rsquo;s advancement has a contribution claim that pure income figures do not capture.</p>
+  <p>Longevity adjustment: a small additional premium (up to 5%, capped) applies for longer marriages. This reflects the compounding effect of contribution and sacrifice over time recognized in most equitable distribution frameworks. The adjustment reaches its cap at approximately 15+ years of marriage.</p>
+  <p>Both adjustments are bounded: the model will not produce a split more extreme than 40/60 or 60/40, which represents the outer range of typical outcomes in equitable distribution states outside of extraordinary circumstances.</p>
+  <p>Formula: <code>incomeRatio = yourIncome / (yourIncome + spouseIncome) | longevityAdj = min(0.05, years × 0.003) | yourFactor = if incomeRatio &lt; 0.5 then (0.5 + longevityAdj) else (0.5 - longevityAdj) | yourShare = netEstate × max(0.4, min(0.6, yourFactor))</code></p>
+
+  <h2>Step 4: Spousal Support Estimate</h2>
+  <p>Spousal support (alimony) is modeled using two parameters: the income gap between the spouses and the length of the marriage.</p>
+  <p>Monthly support amount: estimated at 25% of the gross income gap between the higher and lower earner, divided by 12. This is a generalized approximation; California&rsquo;s formula uses 40% of the higher earner&rsquo;s net income minus 50% of the lower earner&rsquo;s net income, other states vary significantly, and most states give judges full discretion. The 25% figure represents a conservative middle-of-range estimate.</p>
+  <p>Duration: marriages under five years are modeled as zero support — courts rarely award alimony for short marriages without extraordinary circumstances. For marriages of five or more years, the support duration is estimated as the number of months married, capped at 120 months (10 years). This reflects the judicial pattern of awarding alimony for roughly half the length of the marriage for mid-length marriages, with potential for longer duration (and the model&rsquo;s 10-year cap as a conservative ceiling) for longer marriages.</p>
+  <p>Formula: <code>incomeGap = |yourIncome - spouseIncome| | monthlySupport = if years ≥ 5 then incomeGap × 0.25 / 12 else 0 | supportMonths = min(years × 12, 120) | totalSupport = monthlySupport × supportMonths</code></p>
+
+  <h2>What the Model Does Not Account For</h2>
+  <p>Child support: entirely state-specific and income-table-driven. Child support calculations require each state&rsquo;s specific guidelines, which weight gross income, custody percentages, and extraordinary expenses. The model does not attempt to estimate child support.</p>
+  <p>Tax implications: the tax consequences of asset transfers in divorce are significant and often counterintuitive. Capital gains treatment of appreciated assets, the tax implications of QDRO divisions, and the changed alimony tax treatment under the 2017 Tax Cuts and Jobs Act (no deduction for payer, no income to recipient for post-2018 divorces) are not modeled. An attorney and CPA working together on divorce tax planning can recover significant value relative to naive asset division.</p>
+  <p>QDRO complexity: retirement account divisions via Qualified Domestic Relations Orders involve plan-specific rules, actuarial factors for defined benefit plans, and procedural requirements that are not captured in a simple percentage split. The model assumes retirement assets are divisible at face value, which understates the complexity of actual QDRO implementation.</p>
+  <p>Separate property tracing: commingling, transmutation, and the burden of tracing separate property back through years of joint finances are highly fact-specific inquiries. The model treats all inputs as marital property.</p>
+  <p>Judge and jurisdiction discretion: equitable distribution outcomes are strongly influenced by the individual judge, the quality of legal representation, and local judicial culture. Two cases with identical financial facts can produce materially different outcomes in different courtrooms.</p>
+
+  <p>Return to the <a href="/">calculator</a>, see <a href="/guides/how-divorce-asset-division-works">how asset division works</a>, or read the <a href="/faq">FAQ</a>.</p>
 </BaseLayout>
