@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import LeadCapture from '../components/LeadCapture.astro';
 const title = 'Divorce Settlement Calculator | divorcesettlementcalc.com';
 const description = 'Estimate how marital assets may be divided in a divorce. Covers community property vs. equitable distribution, spousal support, and retirement accounts. Free, informational.';
 ---
@@ -31,7 +32,10 @@ const description = 'Estimate how marital assets may be divided in a divorce. Co
     </select>
     <button type="submit">Estimate settlement</button>
   </form>
-  <p id="result" aria-live="polite"></p>
+  
+
+  <LeadCapture caseType="divorce" caseTypeLabel="Divorce" />
+<p id="result" aria-live="polite"></p>
   <h2>How divorce asset division works</h2>
   <p>In community property states, marital property (acquired during the marriage) is split 50/50. Separate property (owned before marriage or received as gift/inheritance) is not subject to division. In equitable distribution states, courts divide marital property &ldquo;equitably&rdquo; &mdash; considering each spouse&rsquo;s income, contributions, needs, and length of marriage. Equitable does not mean equal; outcomes range from 45/55 to 60/40 depending on circumstances.</p>
   <p>The starting point in any divorce is classifying each asset as marital or separate. Marital property is everything acquired during the marriage with marital funds — including the family home, joint savings accounts, investment accounts funded with earned income, and retirement benefits accrued during the marriage. Separate property includes assets owned before the marriage, inheritances received during the marriage (and kept genuinely separate), and gifts from third parties. Commingling — mixing separate property with marital funds — can convert separate property to marital property, which is why documentation and tracing matter.</p>
@@ -40,7 +44,7 @@ const description = 'Estimate how marital assets may be divided in a divorce. Co
   <h2>Understanding your estimate</h2>
   <p>The calculator produces a rough range based on the inputs you provide. It applies the community property 50/50 presumption directly, and for equitable distribution states applies an income-disparity and marriage-length adjustment consistent with published research on typical court outcomes. The spousal support estimate uses 25% of the income gap for marriages of five or more years, capped at the shorter of marriage length in months or 120 months. These are heuristics — actual outcomes depend on your state&rsquo;s specific statutes, your judge&rsquo;s discretion, the quality of negotiation, and facts the calculator cannot know. Use the estimate to orient your thinking, then consult a licensed family law attorney for your specific situation.</p>
   <h2>Where to learn more</h2>
-  <p>See <a href="/guides/how-divorce-asset-division-works">how divorce asset division works</a>, <a href="/guides/spousal-support-guide">spousal support guide</a>, <a href="/guides/what-to-do-during-divorce">what to do during divorce</a>, and <a href="/guides/divorce-settlement-misconceptions">common divorce settlement misconceptions</a>. The <a href="/faq">FAQ</a> covers community property, retirement accounts, and QDRO basics.</p>
+  <p>See <a href="/guides/how-divorce-asset-division-works/">how divorce asset division works</a>, <a href="/guides/spousal-support-guide/">spousal support guide</a>, <a href="/guides/what-to-do-during-divorce/">what to do during divorce</a>, and <a href="/guides/divorce-settlement-misconceptions/">common divorce settlement misconceptions</a>. The <a href="/faq/">FAQ</a> covers community property, retirement accounts, and QDRO basics.</p>
   <script>
     document.getElementById('calc').addEventListener('submit', e => {
       e.preventDefault();
